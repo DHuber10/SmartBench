@@ -1,6 +1,5 @@
-
 import { useEffect, useState } from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
+import { Navigate, useLocation, Link } from 'react-router-dom';
 import { isLoggedIn } from '@/lib/supabase';
 
 interface ProtectedRouteProps {
