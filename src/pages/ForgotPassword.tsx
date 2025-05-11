@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
@@ -15,31 +14,31 @@ interface ForgotPasswordFormValues {
 }
 
 export default function ForgotPassword() {
-  const [isLoading, setIsLoading] = useState(false);
+  const [email, setEmail] = useState('');
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [isSubmitted, setIsSubmitted] = useState(false);
-  const { register, handleSubmit, formState: { errors } } = useForm<ForgotPasswordFormValues>();
+  const [success, setSuccess] = useState(false);
 
-  const onSubmit = async (data: ForgotPasswordFormValues) => {
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+    setSuccess(false);
+    
     try {
-      setIsLoading(true);
-      setError(null);
-      
-      const { error } = await supabase.auth.resetPasswordForEmail(data.email, {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: `${window.location.origin}/reset-password`,
       });
-
-      if (error) {
-        throw error;
-      }
-
-      setIsSubmitted(true);
+      
+      if (error) throw error;
+      
+      setSuccess(true);
       toast.success("Reset password link sent. Please check your email.");
-    } catch (error) {
-      console.error("Password reset error:", error);
-      setError(error instanceof Error ? error.message : "Failed to send reset email. Please try again.");
+    } catch (error: any) {
+      setError(error.message || 'An error occurred while sending the password reset email');
+      console.error('Password reset error:', error);
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
@@ -64,7 +63,7 @@ export default function ForgotPassword() {
             </Alert>
           )}
           
-          {isSubmitted ? (
+          {success ? (
             <div className="space-y-4">
               <Alert>
                 <AlertDescription>
@@ -78,28 +77,20 @@ export default function ForgotPassword() {
               </Link>
             </div>
           ) : (
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <form onSubmit={handleResetPassword} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
                 <Input
                   id="email"
                   type="email"
                   placeholder="hello@example.com"
-                  {...register("email", { 
-                    required: "Email is required",
-                    pattern: {
-                      value: /\S+@\S+\.\S+/,
-                      message: "Please enter a valid email"
-                    }
-                  })}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                 />
-                {errors.email && (
-                  <p className="text-sm text-destructive">{errors.email.message}</p>
-                )}
               </div>
               
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Sending..." : "Send Reset Link"}
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? "Sending..." : "Send Reset Link"}
               </Button>
               
               <div className="text-center">

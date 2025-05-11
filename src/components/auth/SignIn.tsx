@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 
 export default function SignIn() {
   const [email, setEmail] = useState('');
@@ -92,6 +92,15 @@ export default function SignIn() {
             >
               {loading ? 'Signing in...' : 'Sign in'}
             </button>
+          </div>
+          
+          <div className="text-center">
+            <Link 
+              to="/forgot-password" 
+              className="text-sm font-medium text-blue-600 hover:text-blue-500"
+            >
+              Forgot your password?
+            </Link>
           </div>
         </form>
         

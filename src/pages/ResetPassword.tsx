@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
@@ -16,41 +15,69 @@ interface ResetPasswordFormValues {
 }
 
 export default function ResetPassword() {
-  const [isLoading, setIsLoading] = useState(false);
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
+  const [validSession, setValidSession] = useState(false);
   const navigate = useNavigate();
-  const { register, handleSubmit, formState: { errors }, watch } = useForm<ResetPasswordFormValues>();
-  
-  const password = watch("password");
 
+  // Check if we have a valid recovery session
   useEffect(() => {
-    // Check if we have the necessary hash parameters from the reset link
-    const hash = window.location.hash;
-    if (!hash || !hash.includes("type=recovery")) {
-      setError("Invalid or expired password reset link.");
-    }
-  }, []);
-
-  const onSubmit = async (data: ResetPasswordFormValues) => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      
-      const { error } = await supabase.auth.updateUser({
-        password: data.password
-      });
-
-      if (error) {
-        throw error;
+    const checkSession = async () => {
+      try {
+        const { data, error } = await supabase.auth.getSession();
+        
+        if (error) throw error;
+        
+        // Check if we have a session and it's a recovery session
+        if (data.session) {
+          setValidSession(true);
+        } else {
+          // No valid session, redirect to sign in
+          toast.error("Invalid or expired password reset link");
+          setTimeout(() => navigate('/signin', { replace: true }), 2000);
+        }
+      } catch (error) {
+        console.error("Session check error:", error);
+        setError("Failed to validate your session. Please try requesting a new password reset link.");
       }
+    };
 
-      toast.success("Password has been reset successfully");
-      navigate("/signin");
-    } catch (error) {
-      console.error("Password reset error:", error);
-      setError(error instanceof Error ? error.message : "Failed to reset password. Please try again.");
+    checkSession();
+  }, [navigate]);
+
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (password !== confirmPassword) {
+      setError("Passwords don't match");
+      return;
+    }
+    
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const { error } = await supabase.auth.updateUser({
+        password: password
+      });
+      
+      if (error) throw error;
+      
+      setSuccess(true);
+      
+      // Redirect to dashboard after 3 seconds
+      setTimeout(() => {
+        navigate('/dashboard', { replace: true });
+      }, 3000);
+      
+    } catch (error: any) {
+      setError(error.message || 'An error occurred while resetting your password');
+      console.error('Password update error:', error);
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
@@ -75,44 +102,41 @@ export default function ResetPassword() {
             </Alert>
           )}
           
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="password">New Password</Label>
-              <Input
-                id="password"
-                type="password"
-                {...register("password", { 
-                  required: "Password is required",
-                  minLength: {
-                    value: 8,
-                    message: "Password must be at least 8 characters"
-                  }
-                })}
-              />
-              {errors.password && (
-                <p className="text-sm text-destructive">{errors.password.message}</p>
-              )}
+          {success ? (
+            <div className="rounded-md bg-green-50 p-4 text-sm text-green-700">
+              Password updated successfully! Redirecting to dashboard...
             </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirm New Password</Label>
-              <Input
-                id="confirmPassword"
-                type="password"
-                {...register("confirmPassword", { 
-                  required: "Please confirm your password",
-                  validate: value => value === password || "Passwords do not match"
-                })}
-              />
-              {errors.confirmPassword && (
-                <p className="text-sm text-destructive">{errors.confirmPassword.message}</p>
-              )}
-            </div>
-            
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? "Resetting..." : "Reset Password"}
-            </Button>
-          </form>
+          ) : (
+            <form onSubmit={handleResetPassword} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="password">New Password</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  minLength={6}
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="confirmPassword">Confirm New Password</Label>
+                <Input
+                  id="confirmPassword"
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                  minLength={6}
+                />
+              </div>
+              
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? "Updating..." : "Update Password"}
+              </Button>
+            </form>
+          )}
         </div>
       </div>
     </div>
