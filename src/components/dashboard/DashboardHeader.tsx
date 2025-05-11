@@ -1,10 +1,61 @@
-
 import { Button } from "@/components/ui/button";
-import { Menu, X } from "lucide-react";
+import { Menu, X, LogOut, User } from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export function DashboardHeader() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate("/");
+  };
+
+  // Get user initials from first and last name
+  const getUserInitials = () => {
+    if (!user) return "U";
+    
+    // Try to get initials from user metadata
+    const firstName = user.user_metadata?.first_name;
+    const lastName = user.user_metadata?.last_name;
+    
+    if (firstName && lastName) {
+      return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
+    } else if (firstName) {
+      return firstName.charAt(0).toUpperCase();
+    } else if (user.email) {
+      // Fallback to email initial if no name is available
+      return user.email.charAt(0).toUpperCase();
+    }
+    
+    return "U";
+  };
+
+  // Get user's full name or email
+  const getUserDisplayName = () => {
+    if (!user) return "";
+    
+    const firstName = user.user_metadata?.first_name;
+    const lastName = user.user_metadata?.last_name;
+    
+    if (firstName && lastName) {
+      return `${firstName} ${lastName}`;
+    } else if (firstName) {
+      return firstName;
+    }
+    
+    return user.email;
+  };
 
   return (
     <header className="sticky top-0 z-30 w-full border-b bg-background">
@@ -27,11 +78,35 @@ export function DashboardHeader() {
         </nav>
         
         <div className="hidden md:flex items-center space-x-4">
-          <Button variant="ghost" onClick={() => console.log("User profile clicked")}>
-            <div className="h-8 w-8 rounded-full bg-smartbench-gray-light flex items-center justify-center">
-              <span className="text-sm font-medium">JD</span>
-            </div>
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-10 w-10 rounded-full">
+                <div className="h-8 w-8 rounded-full bg-smartbench-gray-light flex items-center justify-center">
+                  <span className="text-sm font-medium">{getUserInitials()}</span>
+                </div>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56">
+              <div className="flex items-center justify-start gap-2 p-2">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-smartbench-gray-light">
+                  <span className="text-sm font-medium">{getUserInitials()}</span>
+                </div>
+                <div className="flex flex-col space-y-0.5">
+                  <p className="text-sm font-medium">{getUserDisplayName()}</p>
+                  <p className="text-xs text-gray-500">{user?.email}</p>
+                </div>
+              </div>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem className="cursor-pointer" onClick={() => console.log("Profile clicked")}>
+                <User className="mr-2 h-4 w-4" />
+                <span>Profile</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem className="cursor-pointer text-red-600" onClick={handleSignOut}>
+                <LogOut className="mr-2 h-4 w-4" />
+                <span>Log out</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
         
         <button
@@ -56,11 +131,25 @@ export function DashboardHeader() {
               Settings
             </a>
             <hr className="my-2" />
-            <div className="px-4 py-2 flex items-center space-x-2">
-              <div className="h-8 w-8 rounded-full bg-smartbench-gray-light flex items-center justify-center">
-                <span className="text-sm font-medium">JD</span>
+            <div className="px-4 py-2 flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <div className="h-8 w-8 rounded-full bg-smartbench-gray-light flex items-center justify-center">
+                  <span className="text-sm font-medium">{getUserInitials()}</span>
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-gray-800 font-medium">{getUserDisplayName()}</span>
+                  <span className="text-xs text-gray-500">{user?.email}</span>
+                </div>
               </div>
-              <span className="text-gray-600">John Doe</span>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                onClick={handleSignOut}
+              >
+                <LogOut className="h-4 w-4 mr-1" />
+                Log out
+              </Button>
             </div>
           </div>
         </div>

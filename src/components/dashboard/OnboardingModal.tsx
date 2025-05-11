@@ -1,4 +1,3 @@
-
 import {
   Dialog,
   DialogContent,
@@ -76,9 +75,18 @@ export function OnboardingModal({ open, onOpenChange }: OnboardingModalProps) {
                 <p className="text-sm text-gray-500">Link your Square account to import sales data</p>
               </div>
             </div>
-            <Button variant="outline" className="w-full" onClick={handleNext}>
-              Connect Square Account
-            </Button>
+            <div className="flex flex-col space-y-2 w-full">
+              <Button variant="outline" className="w-full" onClick={handleNext}>
+                Connect Square Account
+              </Button>
+              <Button 
+                variant="ghost" 
+                className="w-full text-gray-500 hover:text-gray-700" 
+                onClick={handleNext}
+              >
+                Maybe Later
+              </Button>
+            </div>
           </div>
         )}
 
