@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
-import { Menu, X, LogOut, User } from "lucide-react";
+import { Menu, X, LogOut, User, Settings } from "lucide-react";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import {
   DropdownMenu,
@@ -10,11 +10,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { cn } from "@/lib/utils";
 
 export function DashboardHeader() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
+  const { pathname } = useNavigate();
 
   const handleSignOut = async () => {
     await signOut();
@@ -72,9 +74,16 @@ export function DashboardHeader() {
           <a href="#" className="text-gray-600 hover:text-smartbench-blue transition-colors">
             Reports
           </a>
-          <a href="#" className="text-gray-600 hover:text-smartbench-blue transition-colors">
-            Settings
-          </a>
+          <Link
+            to="/integrations"
+            className={cn(
+              "text-gray-600 hover:text-smartbench-blue transition-colors",
+              pathname === "/integrations" ? "text-primary" : "text-muted-foreground"
+            )}
+          >
+            <Settings className="mr-2 h-4 w-4" />
+            Integrations
+          </Link>
         </nav>
         
         <div className="hidden md:flex items-center space-x-4">

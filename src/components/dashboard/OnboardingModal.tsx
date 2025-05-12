@@ -8,19 +8,32 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import { CheckCircle } from "lucide-react";
+import { CheckCircle, CreditCard, ShoppingBag, Store, FileSpreadsheet, MoreHorizontal } from "lucide-react";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 interface OnboardingModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
+type IntegrationOption = "stripe" | "square" | "etsy" | "sheets" | "other" | null;
+
 export function OnboardingModal({ open, onOpenChange }: OnboardingModalProps) {
   const [step, setStep] = useState(1);
   const totalSteps = 3;
+  const [selectedIntegration, setSelectedIntegration] = useState<IntegrationOption>(null);
+  const navigate = useNavigate();
 
   const handleNext = () => {
+    if (step === 1 && selectedIntegration === "stripe") {
+      // If Stripe is selected, close the modal and navigate to integrations page
+      onOpenChange(false);
+      navigate("/integrations");
+      toast.success("Redirecting to Stripe integration...");
+      return;
+    }
+    
     if (step < totalSteps) {
       setStep(step + 1);
     } else {
@@ -37,6 +50,10 @@ export function OnboardingModal({ open, onOpenChange }: OnboardingModalProps) {
   const handleComplete = () => {
     onOpenChange(false);
     toast.success("Onboarding completed! Generating your first insights...");
+  };
+
+  const handleSelectIntegration = (integration: IntegrationOption) => {
+    setSelectedIntegration(integration);
   };
 
   return (
@@ -66,25 +83,105 @@ export function OnboardingModal({ open, onOpenChange }: OnboardingModalProps) {
 
         {step === 1 && (
           <div className="space-y-4">
-            <div className="rounded-xl border p-4 flex items-center space-x-4">
-              <div className="h-12 w-12 rounded-full bg-smartbench-blue/10 flex items-center justify-center text-smartbench-blue">
-                <span className="text-2xl font-bold">1</span>
+            <h3 className="font-medium text-center mb-4">Connect your sales platform</h3>
+            
+            {/* Stripe Option */}
+            <div 
+              className={`rounded-xl border p-4 flex items-center space-x-4 cursor-pointer ${
+                selectedIntegration === "stripe" ? "border-smartbench-blue bg-smartbench-blue/5" : ""
+              }`}
+              onClick={() => handleSelectIntegration("stripe")}
+            >
+              <div className="h-12 w-12 rounded-full bg-[#635BFF] flex items-center justify-center text-white">
+                <CreditCard size={24} />
+              </div>
+              <div>
+                <h3 className="font-medium">Connect Stripe</h3>
+                <p className="text-sm text-gray-500">Link your Stripe account to import payment data</p>
+              </div>
+            </div>
+            
+            {/* Square Option */}
+            <div 
+              className={`rounded-xl border p-4 flex items-center space-x-4 cursor-pointer ${
+                selectedIntegration === "square" ? "border-smartbench-blue bg-smartbench-blue/5" : ""
+              }`}
+              onClick={() => handleSelectIntegration("square")}
+            >
+              <div className="h-12 w-12 rounded-full bg-black flex items-center justify-center text-white">
+                <ShoppingBag size={24} />
               </div>
               <div>
                 <h3 className="font-medium">Connect Square POS</h3>
                 <p className="text-sm text-gray-500">Link your Square account to import sales data</p>
               </div>
             </div>
-            <div className="flex flex-col space-y-2 w-full">
-              <Button variant="outline" className="w-full" onClick={handleNext}>
-                Connect Square Account
+            
+            {/* Etsy Option */}
+            <div 
+              className={`rounded-xl border p-4 flex items-center space-x-4 cursor-pointer ${
+                selectedIntegration === "etsy" ? "border-smartbench-blue bg-smartbench-blue/5" : ""
+              }`}
+              onClick={() => handleSelectIntegration("etsy")}
+            >
+              <div className="h-12 w-12 rounded-full bg-[#F56400] flex items-center justify-center text-white">
+                <Store size={24} />
+              </div>
+              <div>
+                <h3 className="font-medium">Connect Etsy</h3>
+                <p className="text-sm text-gray-500">Link your Etsy shop to import sales data</p>
+              </div>
+            </div>
+            
+            {/* Google Sheets Option */}
+            <div 
+              className={`rounded-xl border p-4 flex items-center space-x-4 cursor-pointer ${
+                selectedIntegration === "sheets" ? "border-smartbench-blue bg-smartbench-blue/5" : ""
+              }`}
+              onClick={() => handleSelectIntegration("sheets")}
+            >
+              <div className="h-12 w-12 rounded-full bg-[#0F9D58] flex items-center justify-center text-white">
+                <FileSpreadsheet size={24} />
+              </div>
+              <div>
+                <h3 className="font-medium">Connect Google Sheets</h3>
+                <p className="text-sm text-gray-500">Import data from your Google Sheets</p>
+              </div>
+            </div>
+            
+            {/* Other Option */}
+            <div 
+              className={`rounded-xl border p-4 flex items-center space-x-4 cursor-pointer ${
+                selectedIntegration === "other" ? "border-smartbench-blue bg-smartbench-blue/5" : ""
+              }`}
+              onClick={() => handleSelectIntegration("other")}
+            >
+              <div className="h-12 w-12 rounded-full bg-gray-500 flex items-center justify-center text-white">
+                <MoreHorizontal size={24} />
+              </div>
+              <div>
+                <h3 className="font-medium">Other Platform</h3>
+                <p className="text-sm text-gray-500">Connect a different sales platform</p>
+              </div>
+            </div>
+            
+            <div className="flex flex-col space-y-2 w-full mt-4">
+              <Button 
+                className="w-full" 
+                onClick={handleNext}
+                disabled={!selectedIntegration}
+              >
+                {selectedIntegration ? `Connect ${selectedIntegration === "sheets" ? "Google Sheets" : selectedIntegration.charAt(0).toUpperCase() + selectedIntegration.slice(1)}` : "Select a platform"}
               </Button>
               <Button 
                 variant="ghost" 
                 className="w-full text-gray-500 hover:text-gray-700" 
-                onClick={handleNext}
+                onClick={() => {
+                  setSelectedIntegration(null);
+                  handleNext();
+                }}
               >
-                Maybe Later
+                I'll do this later
               </Button>
             </div>
           </div>
