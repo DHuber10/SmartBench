@@ -1,28 +1,27 @@
-
 import { Button } from "@/components/ui/button";
-import { ChevronRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
+import { DashboardPreview } from "./DashboardPreview";
 
 export function Hero() {
   return (
-    <section className="pt-24 pb-16">
+    <section className="py-12 md:py-24 lg:py-32 bg-background">
       <div className="container px-4 md:px-6">
-        <div className="grid gap-6 lg:grid-cols-2 lg:gap-12 xl:grid-cols-2">
+        <div className="grid gap-6 lg:grid-cols-2 lg:gap-12 xl:gap-16">
           <div className="flex flex-col justify-center space-y-4">
             <div className="space-y-2">
-              <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl">
-                Turn Your Sales Data Into 
-                <span className="text-smartbench-blue"> Actionable Insights</span>
+              <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl/none">
+                Business Intelligence for Small Business Owners
               </h1>
-              <p className="text-gray-500 md:text-xl dark:text-gray-400 max-w-[700px]">
-                SmartBench connects to your Square POS, analyzes your sales data, and sends you weekly action tips to grow your business. No data science degree required.
+              <p className="max-w-[600px] text-muted-foreground md:text-xl">
+                SmartBench turns your sales data into actionable insights. Connect your Square POS and get weekly reports with data-driven recommendations.
               </p>
             </div>
             <div className="flex flex-col gap-2 min-[400px]:flex-row">
-              <Button size="lg" onClick={() => window.location.href = '/signup'}>
+              <Button size="lg" className="inline-flex items-center">
                 Get Started
-                <ChevronRight className="ml-2 h-4 w-4" />
+                <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
-              <Button size="lg" variant="outline" onClick={() => window.location.href = '#how-it-works'}>
+              <Button size="lg" variant="outline">
                 Learn More
               </Button>
             </div>
@@ -50,14 +49,8 @@ export function Hero() {
             </div>
           </div>
           <div className="flex items-center justify-center">
-            <div className="rounded-xl overflow-hidden shadow-xl border border-gray-100">
-              <img
-                src="/placeholder.svg"
-                alt="SmartBench Dashboard Preview"
-                className="aspect-[16/9] object-cover w-full h-auto"
-                width={800}
-                height={450}
-              />
+            <div className="relative w-full max-w-[600px] aspect-[4/3] overflow-hidden rounded-xl shadow-xl">
+              <DashboardPreview />
             </div>
           </div>
         </div>
