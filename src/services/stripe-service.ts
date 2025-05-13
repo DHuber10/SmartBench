@@ -23,11 +23,11 @@ export class StripeService extends IntegrationService {
   }
   
   async getCharges(startDate: Date, endDate: Date): Promise<any[]> {
-    return api.get('/integrations/stripe/charges', {
-      params: {
-        startDate: startDate.toISOString(),
-        endDate: endDate.toISOString()
-      }
-    });
+    // Convert params to URL search parameters
+    const url = new URL('/integrations/stripe/charges', window.location.origin);
+    url.searchParams.append('startDate', startDate.toISOString());
+    url.searchParams.append('endDate', endDate.toISOString());
+    
+    return api.get(url.toString());
   }
 } 
