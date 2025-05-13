@@ -1,4 +1,3 @@
-
 import {
   createContext,
   useContext,
@@ -9,14 +8,25 @@ import {
 import { supabase } from '@/lib/supabase';
 import { User, Session } from '@supabase/supabase-js';
 
+// Define the context type
 interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
+  signIn: (email: string, password: string) => Promise<void>;
+  signUp: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+// Create and export the context
+export const AuthContext = createContext<AuthContextType>({
+  user: null,
+  session: null,
+  loading: true,
+  signIn: async () => {},
+  signUp: async () => {},
+  signOut: async () => {},
+});
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);

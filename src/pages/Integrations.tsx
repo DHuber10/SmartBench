@@ -1,12 +1,11 @@
-import { DashboardHeader } from '@/components/dashboard/DashboardHeader';
+import { AppHeader } from '@/components/layout/AppHeader';
 import { IntegrationsList } from '@/components/integrations/IntegrationsList';
 import { IntegrationsProvider } from '@/contexts/IntegrationsContext';
 
 export default function Integrations() {
   return (
-    <div className="min-h-screen bg-background">
-      <DashboardHeader />
-      
+    <div className="min-h-screen bg-smartbench-gray-light">
+      <AppHeader />
       <main className="container py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold tracking-tight">Integrations</h1>

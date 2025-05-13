@@ -1,10 +1,10 @@
-
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { SalesChart } from "@/components/dashboard/SalesChart";
 import { ProductsChart } from "@/components/dashboard/ProductsChart";
 import { InsightCard } from "@/components/dashboard/InsightCard";
 import { OnboardingModal } from "@/components/dashboard/OnboardingModal";
 import { useState, useEffect } from "react";
+import { AppHeader } from "@/components/layout/AppHeader";
 
 export default function Dashboard() {
   const [showOnboarding, setShowOnboarding] = useState(false);
@@ -18,10 +18,10 @@ export default function Dashboard() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-smartbench-gray-light">
-      <DashboardHeader />
-      
+    <div className="min-h-screen bg-gray-50">
+      <AppHeader />
       <main className="container py-8">
+        <h1 className="text-2xl font-bold mb-6">Dashboard</h1>
         <div className="flex flex-col md:flex-row gap-4 md:gap-6">
           <div className="w-full md:w-1/2">
             <SalesChart />

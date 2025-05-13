@@ -15,6 +15,7 @@ import ResetPassword from "./pages/ResetPassword";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import { AuthProvider } from "./contexts/AuthContext";
 import Integrations from "./pages/Integrations";
+import Reports from "./pages/Reports";
 
 const queryClient = new QueryClient();
 
@@ -56,6 +57,11 @@ const App = () => (
             <Route path="/integrations" element={
               <ProtectedRoute>
                 <Integrations />
+              </ProtectedRoute>
+            } />
+            <Route path="/reports" element={
+              <ProtectedRoute>
+                <Reports />
               </ProtectedRoute>
             } />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
